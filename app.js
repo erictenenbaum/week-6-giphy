@@ -2,14 +2,14 @@ console.log("hello");
 
 var topics = ["baseball", "basketball", "football", "hockey", "soccer"];
 
-var buttonHolder = $("#buttonHolder");
-var gifyHolder = $("#gifyHolder");
-var sportsFormInput = $("#sport-input");
+var buttonHolderDOM = $("#buttonHolder");
+var gifyHolderDOM = $("#gifyHolder");
+var sportsFormInputDOM = $("#sport-input");
 
-	function displayGifs() {
+function displayGifs() {
 
 	var searchedTopic = ($(this).attr("data-name"));		
-	var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + searchedTopic + "&limit=10" + "&api_key=z0IqDJZH4abMAs3QwyLC3xTLZyRhR4cv"
+	var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + searchedTopic + "&limit=10" + "&api_key=z0IqDJZH4abMAs3QwyLC3xTLZyRhR4cv";
 
 
 	$.ajax({
@@ -19,42 +19,39 @@ var sportsFormInput = $("#sport-input");
 		console.log(response);
 
 		var gifImages = response.data;
+		for (var i = 0; i < gifImages.length; i++) {			
 
-		// console.log(gifImages[1].url);
-
-		// var newImage = $("<img>").attr("src", gifImages[0].images.fixed_height.url);
-
-		// gifyHolder.append(newImage);		
-
-		// console.log(newImage);
-
-		for (var i = 0; i < gifImages.length; i++) {
-
+			var newP = $("<p>");
+			newP.text(gifImages[i].rating);
+					
 			var newImage = $("<img>");
-			newImage.attr("src", gifImages[i].images.original_still.url);
+			newImage.attr("id", "gifImg");
+			newImage.attr("src", gifImages[i].images.fixed_height_still.url);
+			newImage.attr("data-state", "still");
+			newImage.attr("data-still", gifImages[i].images.fixed_height_still.url);
+			newImage.attr("data-gif", gifImages[i].images.fixed_height.url);
 
-			gifyHolder.append(newImage);
+			gifyHolderDOM.prepend(newP);
+			gifyHolderDOM.prepend(newImage);
 		}
-	})
-
+	});
 }
 
-	function createButtons() {
+function createButtons() {
 
-		buttonHolder.empty();
-		sportsFormInput.val("")
+	buttonHolderDOM.empty();
+	sportsFormInputDOM.val("");
 
-			for (var i = 0; i < topics.length; i++) {
-				var newButton =	$("<button>");
-				newButton.text(topics[i]);
-				newButton.attr("class", "gifButton");
-				newButton.attr("data-name", topics[i]);
-				buttonHolder.append(newButton);
-			}
-
+	for (var i = 0; i < topics.length; i++) {
+		var newButton =	$("<button>");
+		newButton.text(topics[i]);
+		newButton.attr("class", "gifButton");
+		newButton.attr("data-name", topics[i]);
+		buttonHolderDOM.append(newButton);
 	}
+};
 
-	$("#add-sport").on("click", function(event){
+$("#add-sport").on("click", function(event){
 
 	event.preventDefault();
 
@@ -63,24 +60,37 @@ var sportsFormInput = $("#sport-input");
 	topics.push(sportButton);	
 
 	createButtons();
-	
+
 });
 
-
-	$(document).on("click", ".gifButton", displayGifs);
+buttonHolderDOM.on("click", ".gifButton", displayGifs);
 
 
 createButtons();
 
+gifyHolderDOM.on("click", "#gifImg", switchGif );
+
+function switchGif(){
+	console.log($(this).attr("data-state"))
+
+	var state = $(this).attr("data-state")
+
+	if(state == "still"){
+
+		$(this).attr("src", $(this).attr("data-gif") );
+		$(this).attr("data-state", "gif");
+
+	}
+	else {
+
+		$(this).attr("src", $(this).attr("data-still"));
+		$(this).attr("data-state", "still");
+	}
+};
 
 
 
 
-// $(".gifButton").on("click", function() {
-// 	// displayGifs();
-// 	// createButtons();
-// 	alert($(this).attr("data-name"));
 
-// });
 
 
